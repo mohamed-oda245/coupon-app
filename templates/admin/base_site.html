@@ -5,13 +5,3 @@
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}">🎫 لوحة تحكم الكوبونات</a></h1>
 {% endblock %}
-
-{% block extrastyle %}
-{{ block.super }}
-<style>
-    /* Simple RTL Fix */
-    body {
-        font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-    }
-</style>
-{% endblock %}
