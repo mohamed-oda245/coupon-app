@@ -1,0 +1,797 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="{{ current_language }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ app_settings.app_description }}">
+    <title>{% block title %}{{ app_settings.app_name }}{% endblock %}</title>
+    
+    <!-- Favicon -->
+    {% if app_settings.favicon %}
+    <link rel="icon" href="{{ app_settings.favicon.url }}">
+    {% endif %}
+    
+    <!-- Bootstrap 5 LTR (Always) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts - Both Arabic & English -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    
+    <style>
+        :root {
+            --primary-color: {{ app_settings.primary_color|default:'#27ae60' }};
+            --secondary-color: {{ app_settings.secondary_color|default:'#2c3e50' }};
+            --accent-color: {{ app_settings.accent_color|default:'#f39c12' }};
+            --transition-speed: 0.3s;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cairo', 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Smooth transitions for language change */
+        .lang-transition {
+            transition: opacity var(--transition-speed) ease;
+        }
+        
+        .lang-fade {
+            opacity: 0;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 1rem 0;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #fff !important;
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: #fff !important;
+            transform: translateY(-2px);
+        }
+        
+        .nav-link.active {
+            color: #fff !important;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+        
+        /* Search Box */
+        .search-box {
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .search-box input {
+            border-radius: 25px;
+            padding: 10px 45px 10px 20px;
+            border: none;
+            width: 100%;
+        }
+        
+        .search-box button {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+        }
+        
+        /* Cards */
+        .coupon-card {
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .coupon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .coupon-card .store-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            object-fit: contain;
+            border: 2px solid #eee;
+        }
+        
+        .discount-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .coupon-code {
+            background: #f8f9fa;
+            border: 2px dashed var(--primary-color);
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        
+        .btn-copy {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-copy:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .btn-favorite {
+            background: transparent;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-favorite:hover, .btn-favorite.active {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+            color: white;
+        }
+        
+        .btn-favorite.active i {
+            color: white;
+        }
+        
+        /* Store Card */
+        .store-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .store-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .store-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+        
+        .store-card h5, .store-card h6 {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .store-card .coupons-count {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        /* Slider */
+        .hero-slider {
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-slider .swiper-slide {
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding: 0 50px;
+        }
+        
+        .hero-slider .slide-content {
+            color: white;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .hero-slider .slide-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .swiper-pagination-bullet-active {
+            background: var(--primary-color) !important;
+        }
+        
+        /* Section Title */
+        .section-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--secondary-color);
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: auto;
+        }
+        
+        footer a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        footer a:hover {
+            color: white;
+        }
+        
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+        }
+        
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 2px;
+        }
+        
+        .tag-best { background: #fff3cd; color: #856404; }
+        .tag-exclusive { background: #d4edda; color: #155724; }
+        .tag-verified { background: #cce5ff; color: #004085; }
+        
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        /* Language Switcher */
+        .lang-switch {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 2px;
+        }
+        
+        .lang-switch a {
+            padding: 5px 12px;
+            border-radius: 18px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .lang-switch a.active {
+            background: white;
+            color: var(--primary-color);
+        }
+        
+        .lang-switch a:hover:not(.active) {
+            color: white;
+        }
+        
+        /* Mobile Bottom Nav */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        .mobile-nav a {
+            flex: 1;
+            text-align: center;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.75rem;
+        }
+        
+        .mobile-nav a.active {
+            color: var(--primary-color);
+        }
+        
+        .mobile-nav a i {
+            font-size: 1.25rem;
+            display: block;
+            margin-bottom: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-nav {
+                display: flex;
+            }
+            
+            body {
+                padding-bottom: 70px;
+            }
+            
+            .hero-slider .swiper-slide {
+                height: 200px;
+                padding: 0 20px;
+            }
+            
+            .hero-slider .slide-content h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* App Download Section */
+        .app-download {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            margin: 2rem 0;
+        }
+        
+        .app-download img {
+            height: 50px;
+            margin: 5px;
+        }
+        
+        /* Loading Animation for Language Switch */
+        .page-transition {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0.7; }
+            to { opacity: 1; }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="page-transition">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+                {% if app_settings.app_logo %}
+                <img src="{{ app_settings.app_logo.url }}" alt="{{ app_settings.app_name }}">
+                {% endif %}
+                <span class="lang-transition" data-ar="{{ app_settings.app_name }}" data-en="{{ app_settings.app_name_en|default:app_settings.app_name }}">
+                    {% if current_language == 'ar' %}{{ app_settings.app_name }}{% else %}{{ app_settings.app_name_en|default:app_settings.app_name }}{% endif %}
+                </span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars text-white"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">
+                            <i class="fas fa-home me-1"></i>
+                            <span data-ar="الرئيسية" data-en="Home">{% if current_language == 'ar' %}الرئيسية{% else %}Home{% endif %}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'stores' %}active{% endif %}" href="{% url 'stores' %}">
+                            <i class="fas fa-store me-1"></i>
+                            <span data-ar="المتاجر" data-en="Stores">{% if current_language == 'ar' %}المتاجر{% else %}Stores{% endif %}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'coupons' %}active{% endif %}" href="{% url 'coupons' %}">
+                            <i class="fas fa-tags me-1"></i>
+                            <span data-ar="الكوبونات" data-en="Coupons">{% if current_language == 'ar' %}الكوبونات{% else %}Coupons{% endif %}</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Search Box -->
+                <form class="search-box d-none d-lg-block mx-3" action="{% url 'search' %}" method="GET">
+                    <input type="text" name="q" placeholder="{% if current_language == 'ar' %}ابحث عن كوبون...{% else %}Search coupons...{% endif %}">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                
+                <ul class="navbar-nav align-items-center">
+                    <!-- Language Switch -->
+                    {% if app_settings.enable_english %}
+                    <li class="nav-item me-2">
+                        <div class="lang-switch">
+                            <a href="{% url 'set_language' 'ar' %}" class="{% if current_language == 'ar' %}active{% endif %}">عربي</a>
+                            <a href="{% url 'set_language' 'en' %}" class="{% if current_language == 'en' %}active{% endif %}">EN</a>
+                        </div>
+                    </li>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link position-relative {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}" href="{% url 'notifications' %}">
+                            <i class="fas fa-bell"></i>
+                            {% if unread_notifications_count > 0 %}
+                            <span class="notification-badge">{{ unread_notifications_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'favorites' %}active{% endif %}" href="{% url 'favorites' %}">
+                            <i class="fas fa-heart"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="fas fa-user me-2"></i>
+                                    <span data-ar="الملف الشخصي" data-en="Profile">{% if current_language == 'ar' %}الملف الشخصي{% else %}Profile{% endif %}</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'favorites' %}">
+                                    <i class="fas fa-heart me-2"></i>
+                                    <span data-ar="المفضلة" data-en="Favorites">{% if current_language == 'ar' %}المفضلة{% else %}Favorites{% endif %}</span>
+                                </a>
+                            </li>
+                            {% if user.is_staff %}
+                            <li>
+                                <a class="dropdown-item" href="/admin/" target="_blank">
+                                    <i class="fas fa-cog me-2"></i>
+                                    <span data-ar="لوحة التحكم" data-en="Admin Panel">{% if current_language == 'ar' %}لوحة التحكم{% else %}Admin Panel{% endif %}</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'logout' %}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>
+                                    <span data-ar="تسجيل الخروج" data-en="Logout">{% if current_language == 'ar' %}تسجيل الخروج{% else %}Logout{% endif %}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt me-1"></i>
+                            <span data-ar="دخول" data-en="Login">{% if current_language == 'ar' %}دخول{% else %}Login{% endif %}</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="mb-3">
+                        {% if app_settings.app_logo %}
+                        <img src="{{ app_settings.app_logo.url }}" alt="" height="30" class="me-2">
+                        {% endif %}
+                        {% if current_language == 'ar' %}{{ app_settings.app_name }}{% else %}{{ app_settings.app_name_en|default:app_settings.app_name }}{% endif %}
+                    </h5>
+                    <p class="text-white-50">
+                        {% if current_language == 'ar' %}{{ app_settings.app_description }}{% else %}{{ app_settings.app_description_en|default:app_settings.app_description }}{% endif %}
+                    </p>
+                    <div class="social-links mt-3">
+                        {% if app_settings.facebook_url %}
+                        <a href="{{ app_settings.facebook_url }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        {% endif %}
+                        {% if app_settings.twitter_url %}
+                        <a href="{{ app_settings.twitter_url }}" target="_blank"><i class="fab fa-twitter"></i></a>
+                        {% endif %}
+                        {% if app_settings.instagram_url %}
+                        <a href="{{ app_settings.instagram_url }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                        {% endif %}
+                        {% if app_settings.tiktok_url %}
+                        <a href="{{ app_settings.tiktok_url }}" target="_blank"><i class="fab fa-tiktok"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h6 class="mb-3">
+                        <span data-ar="روابط سريعة" data-en="Quick Links">{% if current_language == 'ar' %}روابط سريعة{% else %}Quick Links{% endif %}</span>
+                    </h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'index' %}"><span data-ar="الرئيسية" data-en="Home">{% if current_language == 'ar' %}الرئيسية{% else %}Home{% endif %}</span></a></li>
+                        <li class="mb-2"><a href="{% url 'stores' %}"><span data-ar="المتاجر" data-en="Stores">{% if current_language == 'ar' %}المتاجر{% else %}Stores{% endif %}</span></a></li>
+                        <li class="mb-2"><a href="{% url 'coupons' %}"><span data-ar="الكوبونات" data-en="Coupons">{% if current_language == 'ar' %}الكوبونات{% else %}Coupons{% endif %}</span></a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h6 class="mb-3">
+                        <span data-ar="معلومات" data-en="Information">{% if current_language == 'ar' %}معلومات{% else %}Information{% endif %}</span>
+                    </h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'about' %}"><span data-ar="من نحن" data-en="About Us">{% if current_language == 'ar' %}من نحن{% else %}About Us{% endif %}</span></a></li>
+                        <li class="mb-2"><a href="{% url 'contact' %}"><span data-ar="اتصل بنا" data-en="Contact">{% if current_language == 'ar' %}اتصل بنا{% else %}Contact{% endif %}</span></a></li>
+                        <li class="mb-2"><a href="{% url 'privacy' %}"><span data-ar="سياسة الخصوصية" data-en="Privacy">{% if current_language == 'ar' %}سياسة الخصوصية{% else %}Privacy{% endif %}</span></a></li>
+                        <li class="mb-2"><a href="{% url 'terms' %}"><span data-ar="الشروط والأحكام" data-en="Terms">{% if current_language == 'ar' %}الشروط والأحكام{% else %}Terms{% endif %}</span></a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4 mb-4">
+                    <h6 class="mb-3">
+                        <span data-ar="حمّل التطبيق" data-en="Download App">{% if current_language == 'ar' %}حمّل التطبيق{% else %}Download App{% endif %}</span>
+                    </h6>
+                    <p class="text-white-50 small">
+                        <span data-ar="احصل على أفضل العروض مباشرة على هاتفك" data-en="Get the best deals directly on your phone">{% if current_language == 'ar' %}احصل على أفضل العروض مباشرة على هاتفك{% else %}Get the best deals directly on your phone{% endif %}</span>
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if app_settings.play_store_url %}
+                        <a href="{{ app_settings.play_store_url }}" target="_blank">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" height="45">
+                        </a>
+                        {% endif %}
+                        {% if app_settings.app_store_url %}
+                        <a href="{{ app_settings.app_store_url }}" target="_blank">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="App Store" height="45">
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            <div class="text-center text-white-50">
+                <small>&copy; {{ "now"|date:"Y" }} {{ app_settings.app_name }}. 
+                    <span data-ar="جميع الحقوق محفوظة" data-en="All rights reserved">{% if current_language == 'ar' %}جميع الحقوق محفوظة{% else %}All rights reserved{% endif %}</span>.
+                </small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-nav">
+        <a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span data-ar="الرئيسية" data-en="Home">{% if current_language == 'ar' %}الرئيسية{% else %}Home{% endif %}</span>
+        </a>
+        <a href="{% url 'stores' %}" class="{% if request.resolver_match.url_name == 'stores' %}active{% endif %}">
+            <i class="fas fa-store"></i>
+            <span data-ar="المتاجر" data-en="Stores">{% if current_language == 'ar' %}المتاجر{% else %}Stores{% endif %}</span>
+        </a>
+        <a href="{% url 'coupons' %}" class="{% if request.resolver_match.url_name == 'coupons' %}active{% endif %}">
+            <i class="fas fa-tags"></i>
+            <span data-ar="الكوبونات" data-en="Coupons">{% if current_language == 'ar' %}الكوبونات{% else %}Coupons{% endif %}</span>
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'favorites' %}" class="{% if request.resolver_match.url_name == 'favorites' %}active{% endif %}">
+            <i class="fas fa-heart"></i>
+            <span data-ar="المفضلة" data-en="Favorites">{% if current_language == 'ar' %}المفضلة{% else %}Favorites{% endif %}</span>
+        </a>
+        <a href="{% url 'profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+            <i class="fas fa-user"></i>
+            <span data-ar="حسابي" data-en="Profile">{% if current_language == 'ar' %}حسابي{% else %}Profile{% endif %}</span>
+        </a>
+        {% else %}
+        <a href="{% url 'login' %}">
+            <i class="fas fa-sign-in-alt"></i>
+            <span data-ar="دخول" data-en="Login">{% if current_language == 'ar' %}دخول{% else %}Login{% endif %}</span>
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <script>
+        // Current Language
+        const currentLang = '{{ current_language }}';
+        
+        // Show Toast
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast show bg-${type} text-white`;
+            toast.innerHTML = `
+                <div class="toast-body d-flex align-items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                    ${message}
+                </div>
+            `;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Get translated text
+        function getText(arText, enText) {
+            return currentLang === 'ar' ? arText : enText;
+        }
+        
+        // Copy Coupon
+        function copyCoupon(couponId, code) {
+            fetch(`/copy-coupon/${couponId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    navigator.clipboard.writeText(code).then(() => {
+                        showToast(getText('تم نسخ الكود بنجاح!', 'Code copied successfully!'));
+                        // Open store in new tab
+                        if (data.redirect_url) {
+                            window.open(data.redirect_url, '_blank');
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Toggle Favorite
+        function toggleFavorite(couponId, btn) {
+            {% if user.is_authenticated %}
+            fetch(`/toggle-favorite/${couponId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.action === 'added') {
+                        btn.classList.add('active');
+                        btn.innerHTML = '<i class="fas fa-heart"></i>';
+                        showToast(getText('تمت الإضافة للمفضلة', 'Added to favorites'));
+                    } else {
+                        btn.classList.remove('active');
+                        btn.innerHTML = '<i class="far fa-heart"></i>';
+                        showToast(getText('تمت الإزالة من المفضلة', 'Removed from favorites'));
+                    }
+                }
+            });
+            {% else %}
+            window.location.href = '{% url "login" %}';
+            {% endif %}
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

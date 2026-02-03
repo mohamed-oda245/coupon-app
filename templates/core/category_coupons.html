@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_rtl %}{{ category.name }}{% else %}{{ category.name_en|default:category.name }}{% endif %} - {{ app_settings.app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">{% if is_rtl %}الرئيسية{% else %}Home{% endif %}</a></li>
+            <li class="breadcrumb-item active">{% if is_rtl %}{{ category.name }}{% else %}{{ category.name_en|default:category.name }}{% endif %}</li>
+        </ol>
+    </nav>
+    
+    <h1 class="section-title mb-4">
+        <i class="{{ category.icon|default:'fas fa-tag' }} me-2"></i>
+        {% if is_rtl %}{{ category.name }}{% else %}{{ category.name_en|default:category.name }}{% endif %}
+    </h1>
+    
+    <div class="row g-4">
+        {% for coupon in coupons %}
+        {% include 'includes/coupon_card.html' %}
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-tags fa-4x text-muted mb-3"></i>
+            <h4>{% if is_rtl %}لا توجد كوبونات في هذا القسم{% else %}No coupons in this category{% endif %}</h4>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if coupons.has_other_pages %}
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if coupons.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ coupons.previous_page_number }}"><i class="fas fa-chevron-{% if is_rtl %}right{% else %}left{% endif %}"></i></a></li>
+            {% endif %}
+            {% for num in coupons.paginator.page_range %}
+            {% if coupons.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > coupons.number|add:'-3' and num < coupons.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+            {% if coupons.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ coupons.next_page_number }}"><i class="fas fa-chevron-{% if is_rtl %}left{% else %}right{% endif %}"></i></a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

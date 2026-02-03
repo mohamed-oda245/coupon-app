@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_rtl %}المتاجر{% else %}Stores{% endif %} - {{ app_settings.app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="section-title mb-0">
+            <i class="fas fa-store me-2"></i>
+            {% if is_rtl %}جميع المتاجر{% else %}All Stores{% endif %}
+        </h1>
+        <span class="badge bg-primary">{{ stores.paginator.count }} {% if is_rtl %}متجر{% else %}stores{% endif %}</span>
+    </div>
+    
+    <!-- Search -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="GET" class="search-box w-100">
+                <input type="text" name="q" value="{{ search_query }}" placeholder="{% if is_rtl %}ابحث عن متجر...{% else %}Search stores...{% endif %}" class="form-control">
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Stores Grid -->
+    <div class="row g-4">
+        {% for store in stores %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="{% url 'store_detail' store.slug %}" class="text-decoration-none">
+                <div class="store-card">
+                    {% if store.logo %}
+                    <img src="{{ store.logo.url }}" alt="{{ store.name }}">
+                    {% else %}
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-store fa-2x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <h5>{% if is_rtl %}{{ store.name }}{% else %}{{ store.name_en|default:store.name }}{% endif %}</h5>
+                    <span class="coupons-count">{{ store.active_coupons_count }} {% if is_rtl %}كوبون{% else %}coupons{% endif %}</span>
+                    {% if store.is_featured %}
+                    <span class="badge bg-warning text-dark mt-2"><i class="fas fa-star me-1"></i>{% if is_rtl %}مميز{% else %}Featured{% endif %}</span>
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-store fa-4x text-muted mb-3"></i>
+            <h4>{% if is_rtl %}لا توجد متاجر{% else %}No stores found{% endif %}</h4>
+            <p class="text-muted">{% if is_rtl %}جرب البحث بكلمات مختلفة{% else %}Try different search terms{% endif %}</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if stores.has_other_pages %}
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if stores.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ stores.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">
+                    <i class="fas fa-chevron-{% if is_rtl %}right{% else %}left{% endif %}"></i>
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for num in stores.paginator.page_range %}
+            {% if stores.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > stores.number|add:'-3' and num < stores.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            
+            {% if stores.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ stores.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">
+                    <i class="fas fa-chevron-{% if is_rtl %}left{% else %}right{% endif %}"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

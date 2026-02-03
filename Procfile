@@ -1,0 +1,1 @@
+web: gunicorn coupon_project.wsgi:application

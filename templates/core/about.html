@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_rtl %}من نحن{% else %}About Us{% endif %} - {{ app_settings.app_name }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h1 class="section-title mb-4">{% if is_rtl %}من نحن{% else %}About Us{% endif %}</h1>
+    <div class="card" style="border-radius: 20px;">
+        <div class="card-body p-4">
+            {% if is_rtl %}{{ app_settings.about_text|linebreaks }}{% else %}{{ app_settings.about_text_en|default:app_settings.about_text|linebreaks }}{% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

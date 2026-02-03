@@ -1,0 +1,75 @@
+<div class="col-12 col-md-6 col-lg-3">
+    <div class="coupon-card">
+        <!-- Store Logo & Favorite -->
+        <div class="p-3 bg-light d-flex justify-content-between align-items-start">
+            <a href="{% url 'store_detail' coupon.store.slug %}">
+                {% if coupon.store.logo %}
+                <img src="{{ coupon.store.logo.url }}" alt="{{ coupon.store.name }}" class="store-logo">
+                {% else %}
+                <div class="store-logo bg-white d-flex align-items-center justify-content-center">
+                    <i class="fas fa-store text-muted"></i>
+                </div>
+                {% endif %}
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                {% if coupon.discount_percentage > 0 %}
+                <span class="discount-badge">{{ coupon.discount_percentage }}%</span>
+                {% endif %}
+                {% if app_settings.enable_favorites %}
+                <button class="btn-favorite {% if coupon.id in user_favorites %}active{% endif %}" onclick="toggleFavorite({{ coupon.id }}, this)">
+                    <i class="{% if coupon.id in user_favorites %}fas{% else %}far{% endif %} fa-heart"></i>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card-body p-3">
+            <!-- Tags -->
+            <div class="mb-2">
+                {% if coupon.is_best_offer %}
+                <span class="tag tag-best"><i class="fas fa-star me-1"></i>{% if current_language == 'ar' %}أفضل{% else %}Best{% endif %}</span>
+                {% endif %}
+                {% if coupon.is_verified %}
+                <span class="tag tag-verified"><i class="fas fa-check me-1"></i>{% if current_language == 'ar' %}موثق{% else %}Verified{% endif %}</span>
+                {% endif %}
+            </div>
+            
+            <!-- Title -->
+            <h6 class="card-title mb-2">
+                {% if current_language == 'ar' %}{{ coupon.title }}{% else %}{{ coupon.title_en|default:coupon.title }}{% endif %}
+            </h6>
+            
+            <!-- Store Name -->
+            <p class="text-muted small mb-3">
+                <i class="fas fa-store me-1"></i>
+                {% if current_language == 'ar' %}{{ coupon.store.name }}{% else %}{{ coupon.store.name_en|default:coupon.store.name }}{% endif %}
+            </p>
+            
+            <!-- Coupon Code -->
+            <div class="coupon-code mb-3" id="code-{{ coupon.id }}">
+                {{ coupon.code }}
+            </div>
+            
+            <!-- Copy Button -->
+            <button class="btn btn-copy w-100" onclick="copyCoupon({{ coupon.id }}, '{{ coupon.code }}')">
+                <i class="fas fa-copy me-2"></i>
+                {% if current_language == 'ar' %}نسخ الكود{% else %}Copy Code{% endif %}
+            </button>
+            
+            <!-- Stats -->
+            <div class="d-flex justify-content-between mt-3 text-muted small">
+                <span><i class="fas fa-users me-1"></i>{{ coupon.used_count }} {% if current_language == 'ar' %}استخدام{% else %}used{% endif %}</span>
+                {% if coupon.expiry_date %}
+                <span class="{% if coupon.days_until_expiry <= 3 %}text-danger{% endif %}">
+                    <i class="fas fa-clock me-1"></i>
+                    {% if coupon.is_expired %}
+                    {% if current_language == 'ar' %}منتهي{% else %}Expired{% endif %}
+                    {% else %}
+                    {{ coupon.days_until_expiry }} {% if current_language == 'ar' %}يوم{% else %}days{% endif %}
+                    {% endif %}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

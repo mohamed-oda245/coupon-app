@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_rtl %}البحث{% else %}Search{% endif %}: {{ query }} - {{ app_settings.app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="section-title mb-4">
+        <i class="fas fa-search me-2"></i>
+        {% if is_rtl %}نتائج البحث عن{% else %}Search results for{% endif %}: "{{ query }}"
+    </h1>
+    
+    {% if stores %}
+    <h4 class="mb-3">{% if is_rtl %}المتاجر{% else %}Stores{% endif %}</h4>
+    <div class="row g-4 mb-5">
+        {% for store in stores %}
+        <div class="col-6 col-md-3">
+            <a href="{% url 'store_detail' store.slug %}" class="text-decoration-none">
+                <div class="store-card">
+                    {% if store.logo %}
+                    <img src="{{ store.logo.url }}" alt="{{ store.name }}">
+                    {% endif %}
+                    <h6>{{ store.name }}</h6>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if coupons %}
+    <h4 class="mb-3">{% if is_rtl %}الكوبونات{% else %}Coupons{% endif %}</h4>
+    <div class="row g-4">
+        {% for coupon in coupons %}
+        {% include 'includes/coupon_card.html' %}
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if not stores and not coupons %}
+    <div class="text-center py-5">
+        <i class="fas fa-search fa-4x text-muted mb-3"></i>
+        <h4>{% if is_rtl %}لا توجد نتائج{% else %}No results found{% endif %}</h4>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

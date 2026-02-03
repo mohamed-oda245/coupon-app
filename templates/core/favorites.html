@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_rtl %}المفضلة{% else %}Favorites{% endif %} - {{ app_settings.app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="section-title mb-4">
+        <i class="fas fa-heart text-danger me-2"></i>
+        {% if is_rtl %}كوبوناتي المفضلة{% else %}My Favorites{% endif %}
+    </h1>
+    
+    <div class="row g-4">
+        {% for fav in favorites %}
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="coupon-card">
+                <div class="p-3 bg-light d-flex justify-content-between align-items-start">
+                    <a href="{% url 'store_detail' fav.coupon.store.slug %}">
+                        {% if fav.coupon.store.logo %}
+                        <img src="{{ fav.coupon.store.logo.url }}" alt="" class="store-logo">
+                        {% endif %}
+                    </a>
+                    <div class="d-flex align-items-center gap-2">
+                        {% if fav.coupon.discount_percentage > 0 %}
+                        <span class="discount-badge">{{ fav.coupon.discount_percentage }}%</span>
+                        {% endif %}
+                        <button class="btn-favorite active" onclick="toggleFavorite({{ fav.coupon.id }}, this); this.closest('.col-12').remove();">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title mb-2">{% if is_rtl %}{{ fav.coupon.title }}{% else %}{{ fav.coupon.title_en|default:fav.coupon.title }}{% endif %}</h6>
+                    <p class="text-muted small mb-3"><i class="fas fa-store me-1"></i>{% if is_rtl %}{{ fav.coupon.store.name }}{% else %}{{ fav.coupon.store.name_en|default:fav.coupon.store.name }}{% endif %}</p>
+                    <div class="coupon-code text-center mb-3">{{ fav.coupon.code }}</div>
+                    <button class="btn btn-copy w-100" onclick="copyCoupon({{ fav.coupon.id }}, '{{ fav.coupon.code }}')">
+                        <i class="fas fa-copy me-2"></i>{% if is_rtl %}نسخ الكود{% else %}Copy Code{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-heart fa-4x text-muted mb-3"></i>
+            <h4>{% if is_rtl %}لا توجد كوبونات في المفضلة{% else %}No favorites yet{% endif %}</h4>
+            <p class="text-muted">{% if is_rtl %}ابدأ بإضافة كوبوناتك المفضلة{% else %}Start adding your favorite coupons{% endif %}</p>
+            <a href="{% url 'coupons' %}" class="btn btn-primary">{% if is_rtl %}تصفح الكوبونات{% else %}Browse Coupons{% endif %}</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

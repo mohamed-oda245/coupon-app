@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_rtl %}اتصل بنا{% else %}Contact Us{% endif %} - {{ app_settings.app_name }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h1 class="section-title mb-4">{% if is_rtl %}اتصل بنا{% else %}Contact Us{% endif %}</h1>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card" style="border-radius: 20px;">
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">{% if is_rtl %}الاسم{% else %}Name{% endif %}</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %}</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{% if is_rtl %}الهاتف{% else %}Phone{% endif %}</label>
+                                <input type="text" name="phone" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{% if is_rtl %}الموضوع{% else %}Subject{% endif %}</label>
+                                <input type="text" name="subject" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">{% if is_rtl %}الرسالة{% else %}Message{% endif %}</label>
+                                <textarea name="message" rows="5" class="form-control" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    {% if is_rtl %}إرسال{% else %}Send{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card" style="border-radius: 20px;">
+                <div class="card-body p-4">
+                    <h5 class="mb-3">{% if is_rtl %}معلومات التواصل{% else %}Contact Info{% endif %}</h5>
+                    {% if app_settings.contact_email %}
+                    <p><i class="fas fa-envelope text-primary me-2"></i>{{ app_settings.contact_email }}</p>
+                    {% endif %}
+                    {% if app_settings.contact_phone %}
+                    <p><i class="fas fa-phone text-primary me-2"></i>{{ app_settings.contact_phone }}</p>
+                    {% endif %}
+                    {% if app_settings.whatsapp_number %}
+                    <p><i class="fab fa-whatsapp text-success me-2"></i>{{ app_settings.whatsapp_number }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

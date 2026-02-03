@@ -1,0 +1,312 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .guide-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .guide-header {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    .guide-header h1 {
+        margin: 0;
+        font-size: 2rem;
+    }
+    .guide-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-right: 5px solid #27ae60;
+    }
+    .guide-card h3 {
+        color: #27ae60;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .guide-card h3 i {
+        font-size: 1.5rem;
+    }
+    .step {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    .step-number {
+        background: #27ae60;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-left: 15px;
+        flex-shrink: 0;
+    }
+    .step-content {
+        flex: 1;
+    }
+    .step-content strong {
+        color: #2c3e50;
+    }
+    .tip-box {
+        background: #e8f5e9;
+        border-right: 4px solid #27ae60;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+    .tip-box i {
+        color: #27ae60;
+        margin-left: 8px;
+    }
+    .icon-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .icon-table td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .icon-table code {
+        background: #f8f9fa;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+    .quick-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    .quick-link {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        text-decoration: none;
+        color: #2c3e50;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+    }
+    .quick-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        color: #27ae60;
+    }
+    .quick-link i {
+        font-size: 2rem;
+        color: #27ae60;
+        margin-bottom: 10px;
+        display: block;
+    }
+</style>
+
+<div class="guide-container">
+    <!-- Header -->
+    <div class="guide-header">
+        <h1>📖 دليل استخدام لوحة التحكم</h1>
+        <p style="margin-top: 10px; opacity: 0.9;">كل ما تحتاج معرفته لإدارة تطبيقك</p>
+    </div>
+    
+    <!-- Quick Links -->
+    <div class="quick-links">
+        <a href="/admin/core/store/add/" class="quick-link">
+            <i class="fas fa-store"></i>
+            إضافة متجر
+        </a>
+        <a href="/admin/core/coupon/add/" class="quick-link">
+            <i class="fas fa-tags"></i>
+            إضافة كوبون
+        </a>
+        <a href="/admin/core/category/add/" class="quick-link">
+            <i class="fas fa-folder"></i>
+            إضافة قسم
+        </a>
+        <a href="/admin/core/slideritem/add/" class="quick-link">
+            <i class="fas fa-images"></i>
+            إضافة سلايدر
+        </a>
+        <a href="/admin/core/notification/add/" class="quick-link">
+            <i class="fas fa-bell"></i>
+            إرسال إشعار
+        </a>
+        <a href="/admin/core/appsettings/1/change/" class="quick-link">
+            <i class="fas fa-cog"></i>
+            الإعدادات
+        </a>
+    </div>
+    
+    <!-- Add Store -->
+    <div class="guide-card">
+        <h3><i class="fas fa-store"></i> إضافة متجر جديد</h3>
+        <div class="step">
+            <span class="step-number">1</span>
+            <div class="step-content">
+                <strong>اذهب إلى "المتاجر" > "إضافة متجر"</strong>
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-number">2</span>
+            <div class="step-content">
+                <strong>أدخل البيانات:</strong><br>
+                • اسم المتجر (عربي + إنجليزي)<br>
+                • الرابط (slug): مثال noon<br>
+                • رابط المتجر: مثال https://www.noon.com
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-number">3</span>
+            <div class="step-content">
+                <strong>ارفع الشعار</strong> (صورة مربعة 200×200)
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-number">4</span>
+            <div class="step-content">
+                <strong>فعّل ✅ "نشط" و ✅ "متجر مميز"</strong> (ليظهر في الصفحة الرئيسية)
+            </div>
+        </div>
+        <div class="tip-box">
+            <i class="fas fa-lightbulb"></i>
+            <strong>نصيحة:</strong> الترتيب بالأرقام - رقم أصغر يظهر أولاً
+        </div>
+    </div>
+    
+    <!-- Add Coupon -->
+    <div class="guide-card">
+        <h3><i class="fas fa-tags"></i> إضافة كوبون جديد</h3>
+        <div class="step">
+            <span class="step-number">1</span>
+            <div class="step-content">
+                <strong>اذهب إلى "الكوبونات" > "إضافة كوبون"</strong>
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-number">2</span>
+            <div class="step-content">
+                <strong>اختر المتجر والقسم</strong>
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-number">3</span>
+            <div class="step-content">
+                <strong>أدخل:</strong><br>
+                • العنوان: "خصم 20% على الإلكترونيات"<br>
+                • كود الخصم: SAVE20<br>
+                • نسبة الخصم: 20
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-number">4</span>
+            <div class="step-content">
+                <strong>اختر التصنيفات:</strong><br>
+                • ✅ أفضل عرض ← يظهر في "أفضل الكوبونات"<br>
+                • ✅ الأكثر استخداماً ← يظهر في "الأكثر استخداماً"<br>
+                • ✅ حصري ← يظهر بعلامة "حصري"
+            </div>
+        </div>
+        <div class="tip-box">
+            <i class="fas fa-lightbulb"></i>
+            <strong>نصيحة:</strong> رابط الأفلييت هو الرابط الذي يذهب إليه المستخدم عند نسخ الكود
+        </div>
+    </div>
+    
+    <!-- Add Category -->
+    <div class="guide-card">
+        <h3><i class="fas fa-folder"></i> إضافة قسم جديد</h3>
+        <div class="step">
+            <span class="step-number">1</span>
+            <div class="step-content">
+                <strong>اذهب إلى "الأقسام" > "إضافة قسم"</strong>
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-number">2</span>
+            <div class="step-content">
+                <strong>أدخل الاسم والأيقونة</strong>
+            </div>
+        </div>
+        <div class="tip-box">
+            <i class="fas fa-lightbulb"></i>
+            <strong>أيقونات متاحة (Font Awesome):</strong>
+            <table class="icon-table" style="margin-top: 10px;">
+                <tr><td><i class="fas fa-laptop"></i> إلكترونيات</td><td><code>fas fa-laptop</code></td></tr>
+                <tr><td><i class="fas fa-tshirt"></i> أزياء</td><td><code>fas fa-tshirt</code></td></tr>
+                <tr><td><i class="fas fa-spa"></i> جمال</td><td><code>fas fa-spa</code></td></tr>
+                <tr><td><i class="fas fa-utensils"></i> طعام</td><td><code>fas fa-utensils</code></td></tr>
+                <tr><td><i class="fas fa-plane"></i> سفر</td><td><code>fas fa-plane</code></td></tr>
+                <tr><td><i class="fas fa-home"></i> منزل</td><td><code>fas fa-home</code></td></tr>
+                <tr><td><i class="fas fa-futbol"></i> رياضة</td><td><code>fas fa-futbol</code></td></tr>
+                <tr><td><i class="fas fa-gamepad"></i> ألعاب</td><td><code>fas fa-gamepad</code></td></tr>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Send Notification -->
+    <div class="guide-card">
+        <h3><i class="fas fa-bell"></i> إرسال إشعار</h3>
+        <div class="step">
+            <span class="step-number">1</span>
+            <div class="step-content">
+                <strong>اذهب إلى "الإشعارات" > "إضافة إشعار"</strong>
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-number">2</span>
+            <div class="step-content">
+                <strong>اكتب العنوان والرسالة</strong>
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-number">3</span>
+            <div class="step-content">
+                <strong>فعّل ✅ "إرسال للجميع"</strong>
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-number">4</span>
+            <div class="step-content">
+                <strong>احفظ، ثم اختر الإشعار واضغط "إرسال الإشعارات المحددة"</strong>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings -->
+    <div class="guide-card">
+        <h3><i class="fas fa-cog"></i> إعدادات التطبيق</h3>
+        <p>من صفحة الإعدادات يمكنك تغيير:</p>
+        <ul style="margin: 15px 0; padding-right: 20px;">
+            <li>اسم وشعار التطبيق</li>
+            <li>الألوان الرئيسية</li>
+            <li>روابط السوشيال ميديا</li>
+            <li>روابط تحميل التطبيق (Google Play / App Store)</li>
+            <li>محتوى صفحات "من نحن" و"سياسة الخصوصية"</li>
+            <li>تفعيل/تعطيل التسجيل والمفضلة والإشعارات</li>
+        </ul>
+    </div>
+    
+    <!-- Need Help -->
+    <div class="guide-card" style="background: #f8f9fa; border-right-color: #3498db;">
+        <h3 style="color: #3498db;"><i class="fas fa-question-circle"></i> تحتاج مساعدة؟</h3>
+        <p>إذا واجهت أي مشكلة أو لديك استفسار، تواصل معنا وسنساعدك في أقرب وقت.</p>
+    </div>
+</div>
+{% endblock %}
